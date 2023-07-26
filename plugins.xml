@@ -1,0 +1,5 @@
+<library path="lib/libInfoPublisher">
+  <class name="camera_utils/InfoPublisher" type="camera_utils::InfoPublisher" base_class_type="nodelet::Nodelet">
+    <description>The Camera Info Publisher nodelet</description>
+  </class>
+</library>

@@ -1,0 +1,5 @@
+rate:
+  publisher_camera_info: 10 # [Hz]
+
+# Should it use the time from the topic /clock to stamp the camera info messages?
+playing_rosbag: false

@@ -1,0 +1,51 @@
+<launch>
+  
+  <!-- Args corresponding to environment variables -->
+  <arg name="CAMERA_NAME" default="$(optenv CAMERA_NAME)"/>
+
+  <!-- Camera args -->
+  <arg name="camera_frame" default="$(arg CAMERA_NAME)_optical"/>
+  <arg name="camera_calibration_file" default=""/>
+
+  <!-- Other args -->
+  <arg name="custom_config" default=""/>
+
+  <!-- Set to false if the nodelet should run under an external nodelet manager -->
+  <arg name="standalone" default="true"/>
+
+  <!-- Will it run using GNU debugger? -->
+  <arg name="debug" default="false"/>
+  <arg unless="$(arg debug)" name="launch_prefix_debug" value=""/>
+  <arg     if="$(arg debug)" name="launch_prefix_debug" value="debug_roslaunch"/>
+
+  <!-- Will it run as standalone nodelet or using a nodelet manager? -->
+  <arg name="manager" default="$(arg CAMERA_NAME)_info_publisher_manager"/>
+  <arg     if="$(arg standalone)" name="nodelet" value="standalone"/>
+  <arg unless="$(arg standalone)" name="nodelet" value="load"/>
+  <arg     if="$(arg standalone)" name="nodelet_manager" value=""/>
+  <arg unless="$(arg standalone)" name="nodelet_manager" value="$(arg manager)"/>
+  
+  <!-- Namespace -->
+  <group ns="$(arg CAMERA_NAME)">
+
+    <!-- Info Publisher nodelet -->
+    <node name="info_publisher" pkg="nodelet" type="nodelet" args="$(arg nodelet) camera_utils/InfoPublisher $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
+      <!-- ROS parameters config files -->
+      <rosparam file="$(find camera_utils)/config/default.yaml"/>
+
+      <!-- Parameters loaded from launch file -->
+      <param name="camera_name" type="string" value="$(arg CAMERA_NAME)" />
+      <param name="camera_frame" type="string" value="$(arg camera_frame)"/>
+      <param name="camera_calibration_file_path" type="string" value="$(find camera_utils)/config/camera_calibration/$(arg camera_calibration_file)"/>
+
+      <!-- Load a custom param file -->
+      <rosparam if="$(eval not arg('custom_config') == '')" file="$(arg custom_config)"/>
+
+      <!-- Publishers -->
+      <remap from="~camera_info_out" to="camera_info"/>
+
+    </node>
+
+  </group>
+
+</launch>
